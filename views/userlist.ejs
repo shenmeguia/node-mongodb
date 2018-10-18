@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/favicon.ico">
+    <title>成员列表</title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/jumbotron.css" rel="stylesheet">
+  </head>
+  <body>
+    <% include header.ejs %>
+    <div class="container">
+      <h2 style="margin:40px 0;">成员列表</h2>
+      <div class="row">
+        <% for(var i = 0; i < result.length; i++) { %>
+          <div class="col-md-3" style="margin-top:20px;">
+            <a href="/user/<%= result[i].username %>">
+              <p><%= result[i].username %></p>
+              <img src="/avatar/<%= result[i].avatar %>">
+            </a>
+        </div>
+        <% } %>
+      </div>
+      <hr>
+      <footer>
+        <p>&copy; 2016 Company, Inc.</p>
+      </footer>
+    </div>
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+  </body>
+</html>

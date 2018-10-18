@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/favicon.ico">
+    <title>上传头像</title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/jumbotron.css" rel="stylesheet">
+    <style type="text/css">
+      #warning{
+        display:none;
+        margin-top:20px;
+      }
+    </style>
+  </head>
+  <body>
+    <% include header.ejs %>
+    <div class="container">
+      <div class="row">
+        <h2 style="padding:40px 0 20px;">上传头像</h2>
+        <form class="col-lg-6" enctype='multipart/form-data' method="post" action="/dosethead">
+          <div class="form-group">
+            <label for="headImg">用户名</label>
+            <input type="file" class="form-control" id="headImg" name="file">
+          </div>
+          <button class="btn btn-default" type="submit">上传</button>
+        </form>
+      </div>
+      <hr>
+      <footer>
+        <p>&copy; 2016 Company, Inc.</p>
+      </footer>
+    </div>
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+  </body>
+</html>

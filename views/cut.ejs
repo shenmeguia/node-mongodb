@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title></title>
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+  <link rel="stylesheet" href="/css/jquery.Jcrop.css" type="text/css" />
+  <script src="/js/jquery.min.js"></script>
+  <script src="/js/jquery.Jcrop.js"></script>
+  <script src="/js/effect.js"></script>
+</head>
+<body>
+  <img src="/avatar/<%= avatar %>" id="target"/ width="400">
+  <div id="preview-pane">
+    <div class="preview-container">
+      <img src="/avatar/<%= avatar %>" class="jcrop-preview" alt="Preview"/>
+    </div>
+  </div>
+  <button id="btn">裁切</button>
+  <script type="text/javascript">
+    // 获取裁剪框的宽高和xy轴坐标
+    $('#btn').click(function () {
+      var w = parseInt($(".jcrop-holder>div:first").css("width"));
+      var h = parseInt($(".jcrop-holder>div:first").css("height"));
+      var x = parseInt($(".jcrop-holder>div:first").css("left"));
+      var y = parseInt($(".jcrop-holder>div:first").css("top"));
+      $.ajax({
+        url:'/docut',
+        type:'get',
+        data:{"w":w,"h":h,"x":x,"y":y},
+        dataType:'json',
+        success:function(result) {
+          if(result.code === -1) {
+            alert('裁剪失败');
+          }else if(result.code === 1) {
+            alert('裁剪成功');
+            window.location = '/';
+          }
+        }
+      })
+    })
+  </script>
+</body>
+</html>
+

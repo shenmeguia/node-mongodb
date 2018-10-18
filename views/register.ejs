@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/favicon.ico">
+    <title>注册</title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/jumbotron.css" rel="stylesheet">
+    <style type="text/css">
+      #warning{
+        display:none;
+        margin-top:20px;
+      }
+    </style>
+  </head>
+  <body>
+    <% include header.ejs %>
+    <div class="container">
+      <div class="row">
+        <h2 style="padding:40px 0 20px;">欢迎注册</h2>
+        <form class="col-lg-6">
+          <div class="form-group">
+            <label for="username">用户名</label>
+            <input type="text" class="form-control" id="username" placeholder="请输入用户名">
+          </div>
+          <div class="form-group">
+            <label for="password">密码</label>
+            <input type="password" class="form-control" id="password" placeholder="设置密码">
+          </div>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox"> 阅读并遵守用户守则
+            </label>
+          </div>
+          <button class="btn btn-default" id="register">注册</button>
+          <div class="alert alert-danger" role="alert" id="warning">用户名已经存在！</div>
+        </form>
+      </div>
+      <hr>
+      <footer>
+        <p>&copy; 2016 Company, Inc.</p>
+      </footer>
+    </div>
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+      $('.form-group input').keyup(function () {
+        $('#warning').fadeOut();
+      })
+      $('#register').click(function () {
+        var username = $('#username').val();
+        var password = $('#password').val();
+        if(username === '' || password === '') {
+          alert('用户名和密码都不能为空！！')
+          return;
+        }
+        $.ajax({
+          type:'post',
+          url:'/doregister',
+          dataType:'json',
+          data:{"username":username,"password":password},
+          success: function(result) {
+            if(result.code == -2) {
+              // 服务器错误
+            }else if(result.code == -1) {
+              // 用户名已存在
+              $('#warning').fadeIn();
+            }else if(result.code == 1) {
+              // 注册成功 跳转回首页
+              alert('注册成功');
+              window.location = '/';
+            }
+          }
+        })
+      })
+    </script>
+  </body>
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/favicon.ico">
+    <title>说说</title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/jumbotron.css" rel="stylesheet">
+    <style type="text/css">
+      #warning{
+        display:none;
+        margin-top:20px;
+      }
+      #name{
+        margin:0;
+        font-size:24px;
+        line-height:24px;
+      }
+      #content{
+        margin:20px 0;
+      }
+      #mubanBox > div{
+        min-height: 200px;
+      }
+      #mubanBox img{
+        padding-right:10px;
+      }
+      #mubanBox #content{
+        /*限制文本行数*/
+        display: -webkit-box;
+        display: -moz-box;
+        white-space: pre-wrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp:2;   /*显示行数*/
+      }
+    </style>
+  </head>
+  <body>
+    <% include header.ejs %>
+    <!-- 登录和没登录展示不同内容 -->
+    <% if(!login) { %>
+      <div class="jumbotron">
+        <div class="container">
+          <div class="row col-lg-6 col-xs-6">
+            <h2>欢迎注册！</h2>
+            <p>这是用node和MongoDB做的一个说说小案例</p>
+            <p><a class="btn btn-primary btn-lg" href="/register" role="button">注册 &raquo;</a></p>
+          </div>
+          <div class="row col-lg-6 col-xs-6">
+            <h3>登录</h3>
+            <form>
+              <div class="form-group">
+                <label for="username">用户名</label>
+                <input type="text" class="form-control" id="username" placeholder="请输入用户名">
+              </div>
+              <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" class="form-control" id="password" placeholder="设置密码">
+              </div>
+              <button class="btn btn-default" id="login">登陆</button>
+              <div class="alert alert-danger" role="alert" id="warning">用户名不存在！</div>
+            </form>
+          </div>
+        </div>
+      </div>
+    <% }else { %>
+      <div class="jumbotron">
+        <div class="container">
+          <div class="row col-lg-1">
+            <a href="/sethead"><img src="/avatar/<%= avatar %>" width="100" height="100" style="margin-bottom: 10px;"></a>
+          </div>
+          <div class="row col-lg-6 col-lg-offset-1">
+            <h3 id="name"><%= username %></h3>
+            <textarea class="form-control" rows="3" name="content" id="content" placeholder="请输入你想发表的内容...."></textarea>
+            <p><a class="btn btn-primary btn-lg" href="javascript:;" role="button" id="post">发表 &raquo;</a></p>
+          </div>
+        </div>
+      </div>
+    <% } %>
+    <div class="container">
+      <% if(login) { %>
+        <!-- 分页 -->
+        <ul class="pagination">
+            
+        </ul>
+        <div class="row" id="mubanBox">
+          <!-- 模板插入位置 -->
+        </div>
+      <% } %>
+      <hr>
+      <footer>
+        <p>&copy; 2016 Company, Inc.</p>
+      </footer>
+    </div>
+    <!-- underscore模板 -->
+    <script type="text/template" id="muban">
+      <div class="col-md-4">
+        <h3><img src="/avatar/{{= avatar }}" width="40">{{= username }}</h3>
+        <p id="content">{{= content }}</p>
+        <p><a class="btn btn-default" href="#" role="button">查看详情 &raquo;</a></p>
+      </div>
+    </script>
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/underscore.js"></script>
+    <script type="text/javascript">
+      $('.form-group input').keyup(function () {
+        $('#warning').fadeOut();
+      });
+      // 登录
+      $('#login').click(function () {
+        var username = $('#username').val();
+        var password = $('#password').val();
+        if(username === '' || password === '') {
+          return;
+        }
+        $.ajax({
+          type:'post',
+          url:'/dologin',
+          dataType:'json',
+          data:{"username":username,"password":password},
+          success: function(result) {
+            if(result.code == -2) {
+              // 服务器错误
+            }else if(result.code == -1) {
+              // 用户名不存在
+              $('#warning').html('用户名不存在！');
+              $('#warning').fadeIn();
+            }else if(result.code == 1) {
+              // 注册成功 跳转回首页
+              window.location = '/';
+            }else if(result.code == -3) {
+              // 密码错误
+              $('#warning').html('密码错误！');
+              $('#warning').fadeIn();
+            }
+          }
+        })
+      });
+      // 发表说说
+      $('#post').click(function () {
+        if($('#content').val() === '') {
+          return;
+        }
+        $.ajax({
+          url:'/post',
+          type:'post',
+          dataType:'json',
+          data:{"content":$('#content').val()},
+          success:function (result) {
+            if(result.code === 1) {
+              alert('发表成功');
+              $('#content').val('');
+              window.location = '/'
+            }else {
+              alert('发表失败');
+            }
+          }
+        })
+      });
+      // 默认访问第一页
+      getPage(0);
+      function getPage(page) {
+        // 外层Ajax获取说说列表
+        // 内层Ajax通过外层获取到的username再获取一次头像
+        // 迭代器的方式将异步变为同步
+        $('#mubanBox').html('');
+        $.ajax({
+        url:'/getallpost?page=' + page,
+        type:'get',
+        dataType:'json',
+        success:function(result) {
+          // 初始化underscore模板
+          var tem = _.template($('#muban').html());
+          iterator(0);
+          function iterator(i) {
+            // 迭代器终止条件
+            if(i === result.data.length) {
+              return;
+            }
+            $.ajax({
+              url:'/getuserinfo?username=' + result.data[i].username,
+              type:'get',
+              dataType:'json',
+              success: function(result2) {
+                // 给数据增加头像数据
+                result.data[i].avatar = result2.data.avatar;
+                var html = tem(result.data[i]);
+                $('#mubanBox').append($(html));
+                iterator(i + 1);//迭代一次
+              }
+            })
+          }
+        }
+      })
+    }
+    // 分页
+    $.ajax({
+      url:'/getallcount',
+      type:'get',
+      success:function(result) {
+        // 总页数
+        var pageAmount = Math.ceil(result.count / 6);
+        // 根据页数创建对应的分页数
+        for(var i = 0; i < pageAmount; i++) {
+          $('.pagination').append("<li class='pageBtn'><a href='javascript:;''>" + i +"</a></li>")
+        }
+        $('.pagination li:first').addClass('active');
+        // 给分页按钮添加点击事件
+        $('.pagination li').click(function () {
+          var page = $(this).index();
+          getPage(page);
+          $(this).addClass('active').siblings().removeClass('active');
+        })
+      }
+    })
+    </script>
+  </body>
+</html>

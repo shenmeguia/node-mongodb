@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/favicon.ico">
+    <title><%= user %>的主页</title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/jumbotron.css" rel="stylesheet">
+    <style type="text/css">
+      #content{
+        min-height:150px;
+      }
+      .container img{
+        margin:20px;
+      }
+      .container h2 {
+        margin-bottom:20px;
+      }
+    </style>
+  </head>
+  <body>
+    <% include header.ejs %>
+    <div class="container">
+      <a href="/sethead"><img src="/avatar/<%= avatar %>"></a>
+      <h2><%= user %>的主页</h2>
+      <hr>
+      <div class="row">
+        <% for(var i = 0; i < result.length; i++) { %>
+          <div class="col-md-4" id="content">
+            <p><%= result[i].content %></p>
+            <p>发布于：<%= result[i].time %></p>
+        </div>
+        <% } %>
+      </div>
+      <hr>
+      <footer>
+        <p>&copy; 2016 Company, Inc.</p>
+      </footer>
+    </div>
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+  </body>
+</html>
